@@ -1,4 +1,5 @@
 import json
+import random
 import argparse
 from collections import defaultdict, Counter
 
@@ -177,6 +178,7 @@ if __name__ == '__main__':
             help='Whether to evaluate the nltk model. Need to install the package if set to True.')
     args = parser.parse_args()
 
+    random.seed(42)
     # Load data
     if args.verbose:
         print('Loading data...')
