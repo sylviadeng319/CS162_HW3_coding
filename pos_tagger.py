@@ -200,3 +200,8 @@ if __name__ == '__main__':
     if args.use_nltk:
         dev_acc = pos_tagger.test_acc(dev_data, use_nltk=True)
         print(f'Accuracy of the NLTK model on the dev set: {dev_acc}')
+
+    # Tags for custom sentence
+    custom_sentence = "Eddie caught the ball .".split()
+    tags = None # TODO: Get model predicted tags for the custom sentence
+    print (tags)
