@@ -76,7 +76,7 @@ class POSTagger():
         """
         tran_prob = defaultdict(lambda: 0) # if a tuple is unseen during training, we set its transition praobility to 0
         for tag_bigram in self.tag_bigram_cnt:
-            tran_prob[tag_bigram] = None # TODO: replace None
+            tran_prob[tag_bigram] = self.tag_bigram_cnt[tag_bigram] / self.tag_unigram_cnt[tag_bigram[0]] # TODO: replace None
         return tran_prob
 
     def compute_emis_prob(self):
@@ -87,7 +87,7 @@ class POSTagger():
         """
         emis_prob = defaultdict(lambda: 0) # if a tuple is unseen during training, we set its transition praobility to 0
         for tag, word in self.tag_word_cnt:
-            emis_prob[(tag, word)] = None # TODO: replace None
+            emis_prob[(tag, word)] = self.tag_word_cnt[(tag, word)] / self.tag_unigram_cnt[tag] # TODO: replace None
         return emis_prob
 
     def init_prob(self, tag):
@@ -96,7 +96,7 @@ class POSTagger():
         Returns:
             tag_init_prob (float): the initial probaiblity for {tag}
         """
-        tag_init_prob = None # TODO: replace None
+        tag_init_prob = self.tag_bigram_cnt[("<bos>", tag)] / self.tag_unigram_cnt["<bos>"] # TODO: replace None
         return tag_init_prob
 
     def viterbi(self, sent):
@@ -119,27 +119,32 @@ class POSTagger():
         # TODO implement the Viberti algorithm for POS tagging.
         # We provide an example implementation below with parts of the code removed, but feel free
         # to write your own implementation.
-        """
+        #"""
         V = {}
         backtrack = {}
         for step, word in enumerate(sent):
             for tag in self.all_tags:
                 if step == 0:
-                    V[tag, step] = None #replace None
+                    V[tag, step] = self.init_prob(tag) * self.emis_prob[(tag, word)] #replace None
                 else:
-                    pass #replace pass
+                    max_prob = 0 
+                    max_prev_tag = None #replace pass
                     for prev_tag in self.all_tags:
-                        pass #replace pass
-                    V[(tag, step)] = None #replace None
-                    backtrack[(tag, step)] = #replace None
+                        temp_prob = V[prev_tag, step-1] * self.tran_prob[(prev_tag, tag)]
+                        if temp_prob > max_prob:
+                            max_prob = temp_prob
+                            max_prev_tag = prev_tag
+                        #replace pass
+                    V[(tag, step)] = max_prob * self.emis_prob[(tag, word)] #replace None
+                    backtrack[(tag, step)] = max_prev_tag #replace None
 
-        prev_tag = None #replace None
-        pos_tag = [prev_tag]        
+        prev_tag = max(self.all_tags, key=lambda tag: V[(tag, len(sent)-1)]) #replace None
+        pos_tag = [prev_tag]
         for step in range(len(sent)-1, 0, -1):
             prev_tag = backtrack[(prev_tag, step)]
             pos_tag.append(prev_tag)
         pos_tag = pos_tag[::-1]
-        """
+        #"""
         return pos_tag
                         
 
@@ -203,5 +208,5 @@ if __name__ == '__main__':
 
     # Tags for custom sentence
     custom_sentence = "Eddie caught the ball .".split()
-    tags = None # TODO: Get model predicted tags for the custom sentence
+    tags = pos_tagger.viterbi(custom_sentence) # TODO: Get model predicted tags for the custom sentence
     print (tags)
