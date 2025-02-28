@@ -127,7 +127,7 @@ class POSTagger():
                 if step == 0:
                     V[tag, step] = self.init_prob(tag) * self.emis_prob[(tag, word)] #replace None
                 else:
-                    max_prob = 0 
+                    max_prob = -float("inf")
                     max_prev_tag = None #replace pass
                     for prev_tag in self.all_tags:
                         temp_prob = V[prev_tag, step-1] * self.tran_prob[(prev_tag, tag)]
